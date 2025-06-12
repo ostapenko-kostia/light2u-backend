@@ -95,17 +95,6 @@ model TextField {
   @@unique([slug, locale])
 }
 
-model FailedLoginAttempt {
-  id Int @id @unique @default(autoincrement())
-
-  ip       String @unique
-  attempts Int    @default(0)
-
-  lockUntil DateTime?
-
-  updatedAt DateTime @updatedAt
-}
-
 model Slide {
   id Int @id @unique @default(autoincrement())
 
@@ -119,11 +108,3 @@ model Slide {
   updatedAt DateTime @updatedAt
 }
 
-model Gallery {
-  id Int @id @unique @default(autoincrement())
-
-  image String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
