@@ -1,0 +1,71 @@
+import { adminAuthMiddleware } from '@/middlewares/admin-auth.middleware'
+import { productsService } from '@/services/products.service'
+import { NextFunction, Request, Response, Router } from 'express'
+import multer from 'multer'
+
+const router = Router()
+const storage = multer.memoryStorage()
+const upload = multer({
+	storage: storage,
+	limits: {
+		fileSize: 5 * 1024 * 1024 // 5MB limit
+	}
+})
+
+router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const serviceResponse = await productsService.get()
+		res.status(200).json({ data: serviceResponse, ok: true })
+	} catch (error) {
+		next(error)
+	}
+})
+
+router.post(
+	'/',
+	adminAuthMiddleware,
+	upload.array('images'),
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const productInfo = JSON.parse(req.body.productInfo)
+			const images = req.files
+			const product = await productsService.create(productInfo, images)
+			res.status(200).json({ product, ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
+
+router.put(
+	'/:id',
+	adminAuthMiddleware,
+	upload.array('images'),
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const productInfo = JSON.parse(req.body.productInfo ?? '{}')
+			const images = req.files
+			const id = +req.params.id
+			const product = await productsService.edit(id, productInfo, images)
+			res.status(200).json({ product, ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
+
+router.delete(
+	'/:id',
+	adminAuthMiddleware,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const id = +req.params.id
+			await productsService.delete(id)
+			res.status(200).json({ ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
+
+export const productsController = router

@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id   Int    @id @unique @default(autoincrement())
+  slug String @unique
+
+  name        String
+  images      String[]
+  description String
+  price       Int
+
+  locale String @default("uk")
+
+  quantity Int?
+  order    Int  @default(autoincrement())
+
+  info         ProductInfo[]
+  category     SecondLevelCategory @relation(fields: [categorySlug], references: [slug])
+  categorySlug String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductInfo {
+  id Int @id @unique @default(autoincrement())
+
+  key   String
+  value String
+  order Int    @default(0)
+
+  product   Product @relation(references: [id], fields: [productId], onDelete: Cascade)
+  productId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FirstLevelCategory {
+  id   Int    @id @unique @default(autoincrement())
+  slug String @unique
+
+  image String
+  name  Json
+
+  childrenCategories SecondLevelCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SecondLevelCategory {
+  id   Int    @id @unique @default(autoincrement())
+  slug String @unique
+
+  image String
+  name  Json
+
+  parentCategory     FirstLevelCategory @relation(fields: [parentCategorySlug], references: [slug])
+  parentCategorySlug String
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  id Int @id @unique @default(autoincrement())
+
+  login    String @unique
+  password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TextField {
+  id Int @id @unique @default(autoincrement())
+
+  slug   String
+  locale String @default("uk")
+  text   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([slug, locale])
+}
+
+model FailedLoginAttempt {
+  id Int @id @unique @default(autoincrement())
+
+  ip       String @unique
+  attempts Int    @default(0)
+
+  lockUntil DateTime?
+
+  updatedAt DateTime @updatedAt
+}
+
+model Slide {
+  id Int @id @unique @default(autoincrement())
+
+  background  String
+  description String
+  text        String
+  url         String
+  locale      String @default("uk")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Gallery {
+  id Int @id @unique @default(autoincrement())
+
+  image String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
