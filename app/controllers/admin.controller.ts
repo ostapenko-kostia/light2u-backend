@@ -61,4 +61,17 @@ router.delete(
 	}
 )
 
+router.post(
+	'/verify',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const token = req.body.token
+			const decoded = adminService.verify(token)
+			res.status(200).json({ decoded, ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
+
 export const adminController = router
