@@ -68,4 +68,46 @@ router.delete(
 	}
 )
 
+router.post(
+	'/:id/duplicate',
+	adminAuthMiddleware,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const id = +req.params.id
+			const product = await productsService.duplicate(id)
+			res.status(200).json({ product, ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
+
+router.patch(
+	'/:id/move-up',
+	adminAuthMiddleware,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const id = +req.params.id
+			const product = await productsService.moveUp(id)
+			res.status(200).json({ product, ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
+
+router.patch(
+	'/:id/move-down',
+	adminAuthMiddleware,
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const id = +req.params.id
+			const product = await productsService.moveDown(id)
+			res.status(200).json({ product, ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
+
 export const productsController = router
