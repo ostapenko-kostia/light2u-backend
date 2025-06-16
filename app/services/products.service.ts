@@ -130,7 +130,11 @@ class ProductsService {
 	async delete(id: number) {
 		const candidate = await prisma.product.findUnique({ where: { id } })
 		if (!candidate) throw new ApiError(404, 'Такого товару не існує')
-		await Promise.all(candidate.images.map(image => deleteFile(image)))
+		try {
+			await Promise.all(candidate.images.map(image => deleteFile(image)))
+		} catch (error) {
+			console.log('Failed to delete images, continue...')
+		}
 		await prisma.product.delete({ where: { id }, include: { info: true } })
 	}
 
@@ -185,27 +189,27 @@ class ProductsService {
 		const candidate = await prisma.product.findUnique({ where: { id } })
 		if (!candidate) throw new ApiError(404, 'Такого товару не існує')
 
-		const higherProduct = await prisma.product.findFirst({
+		const nextProduct = await prisma.product.findFirst({
 			where: {
-				order: { gt: candidate.order }
+				order: { gt: candidate.order },
+				categorySlug: candidate.categorySlug
 			},
 			orderBy: { order: 'asc' }
 		})
 
-		if (!higherProduct) {
-			throw new ApiError(400, 'Товар вже знаходиться на найвищій позиції')
+		if (nextProduct) {
+			// Swap orders
+			await prisma.$transaction([
+				prisma.product.update({
+					where: { id: candidate.id },
+					data: { order: nextProduct.order }
+				}),
+				prisma.product.update({
+					where: { id: nextProduct.id },
+					data: { order: candidate.order }
+				})
+			])
 		}
-
-		await prisma.$transaction([
-			prisma.product.update({
-				where: { id: candidate.id },
-				data: { order: higherProduct.order }
-			}),
-			prisma.product.update({
-				where: { id: higherProduct.id },
-				data: { order: candidate.order }
-			})
-		])
 
 		return await prisma.product.findUnique({
 			where: { id },
@@ -217,27 +221,27 @@ class ProductsService {
 		const candidate = await prisma.product.findUnique({ where: { id } })
 		if (!candidate) throw new ApiError(404, 'Такого товару не існує')
 
-		const lowerProduct = await prisma.product.findFirst({
+		const prevProduct = await prisma.product.findFirst({
 			where: {
-				order: { lt: candidate.order }
+				order: { lt: candidate.order },
+				categorySlug: candidate.categorySlug
 			},
 			orderBy: { order: 'desc' }
 		})
 
-		if (!lowerProduct) {
-			throw new ApiError(400, 'Товар вже знаходиться на найнижчій позиції')
+		if (prevProduct) {
+			// Swap orders
+			await prisma.$transaction([
+				prisma.product.update({
+					where: { id: candidate.id },
+					data: { order: prevProduct.order }
+				}),
+				prisma.product.update({
+					where: { id: prevProduct.id },
+					data: { order: candidate.order }
+				})
+			])
 		}
-
-		await prisma.$transaction([
-			prisma.product.update({
-				where: { id: candidate.id },
-				data: { order: lowerProduct.order }
-			}),
-			prisma.product.update({
-				where: { id: lowerProduct.id },
-				data: { order: candidate.order }
-			})
-		])
 
 		return await prisma.product.findUnique({
 			where: { id },
