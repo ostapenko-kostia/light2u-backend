@@ -187,9 +187,9 @@ class ProductsService {
 
 		const higherProduct = await prisma.product.findFirst({
 			where: {
-				order: { lt: candidate.order }
+				order: { gt: candidate.order }
 			},
-			orderBy: { order: 'desc' }
+			orderBy: { order: 'asc' }
 		})
 
 		if (!higherProduct) {
@@ -219,9 +219,9 @@ class ProductsService {
 
 		const lowerProduct = await prisma.product.findFirst({
 			where: {
-				order: { gt: candidate.order }
+				order: { lt: candidate.order }
 			},
-			orderBy: { order: 'asc' }
+			orderBy: { order: 'desc' }
 		})
 
 		if (!lowerProduct) {
