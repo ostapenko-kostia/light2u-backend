@@ -2,8 +2,8 @@ import { AdminCreateDto, AdminDto, AdminLoginDto } from '@/dtos/admin.dto'
 import { prisma } from '@/lib/prisma'
 import { ApiError } from '@/utils/api-error'
 import bcrypt from 'bcrypt'
-import { tokenService } from './token.service'
 import { JwtPayload } from 'jsonwebtoken'
+import { tokenService } from './token.service'
 
 class AdminService {
 	async login(body: AdminLoginDto) {
@@ -55,10 +55,15 @@ class AdminService {
 	}
 
 	async verify(token: string) {
-		const decoded = tokenService.validateAccessToken(token) as JwtPayload
-		const id = decoded?.id
+		const decoded = tokenService.validateAccessToken(token) as JwtPayload | null
+		if (!decoded) throw new ApiError(401, 'Недійсний або прострочений токен')
+
+		const id = decoded.id
 		if (!id) throw new ApiError(404, 'Такого адміністратора не існує')
+
 		const admin = await prisma.admin.findUnique({ where: { id } })
+		if (!admin) throw new ApiError(404, 'Такого адміністратора не існує')
+
 		const dto = new AdminDto(admin)
 		return dto
 	}

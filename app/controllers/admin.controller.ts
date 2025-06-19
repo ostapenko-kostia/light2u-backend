@@ -65,8 +65,8 @@ router.post(
 	'/verify',
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const token = req.body.token
-			const decoded = adminService.verify(token)
+			const token = req.body.token || ''
+			const decoded = await adminService.verify(token)
 			res.status(200).json({ decoded, ok: true })
 		} catch (error) {
 			next(error)

@@ -14,88 +14,89 @@ import {
 import { Type } from 'class-transformer'
 
 class ProductInfoDto {
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Назва характеристики повинна бути рядком' })
+	@IsNotEmpty({ message: "Назва характеристики є обов'язковою" })
 	key: string
 
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Значення характеристики повинне бути рядком' })
+	@IsNotEmpty({ message: "Значення характеристики є обов'язковим" })
 	value: string
 
-	@IsNumber()
-	@Min(0)
+	@IsNumber(
+		{ allowNaN: false, allowInfinity: false },
+		{ message: 'Порядок повинен бути числом' }
+	)
+	@Min(0, { message: "Порядок не може бути від'ємним" })
 	order: number
 }
 
 export class ProductCreateDto {
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Назва повинна бути рядком' })
+	@IsNotEmpty({ message: "Назва є обов'язковою" })
 	name: string
 
-	@IsNumber()
-	@IsPositive()
+	@IsNumber(
+		{ allowNaN: false, allowInfinity: false },
+		{ message: 'Ціна повинна бути числом' }
+	)
+	@IsPositive({ message: "Ціна не може бути від'ємною" })
 	price: number
 
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Опис повинен бути рядком' })
+	@IsNotEmpty({ message: "Опис є обов'язковим" })
 	description: string
 
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Категорія не вказана' })
+	@IsNotEmpty({ message: 'Категорія не вказана' })
 	categorySlug: string
 
-	@IsArray()
-	@ArrayNotEmpty()
+	@IsArray({ message: 'Характеристики повинні бути масивом' })
 	@ValidateNested({ each: true })
 	@Type(() => ProductInfoDto)
+	@IsOptional()
 	productInfo: ProductInfoDto[]
 
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Мова не вказана' })
+	@IsNotEmpty({ message: 'Мова не вказана' })
 	@IsIn(['uk', 'ru'])
 	locale: 'uk' | 'ru'
 
-	@IsNumber()
-	@Min(0)
+	@IsNumber({ allowNaN: false, allowInfinity: false }, { message: 'Кількість повинна бути числом' })
+	@Min(0, { message: "Кількість не може бути від'ємною" })
 	quantity: number
 }
 
 export class ProductEditDto {
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Назва повинна бути рядком' })
 	@IsOptional()
 	name: string
 
-	@IsNumber()
-	@IsPositive()
+	@IsNumber({ allowNaN: false, allowInfinity: false }, { message: 'Ціна повинна бути числом' })
+	@IsPositive({ message: "Ціна не може бути від'ємною" })
 	@IsOptional()
 	price: number
 
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Опис повинен бути рядком' })
 	@IsOptional()
 	description: string
 
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Категорія не вказана' })
 	@IsOptional()
 	categorySlug: string
 
-	@IsArray()
-	@ArrayNotEmpty()
+	@IsArray({ message: 'Характеристики повинні бути масивом' })
 	@ValidateNested({ each: true })
 	@Type(() => ProductInfoDto)
 	@IsOptional()
 	productInfo: ProductInfoDto[]
 
-	@IsString()
-	@IsNotEmpty()
+	@IsString({ message: 'Мова не вказана' })
 	@IsIn(['uk', 'ru'])
 	@IsOptional()
 	locale: 'uk' | 'ru'
 
-	@IsNumber()
-	@Min(0)
+	@IsNumber({ allowNaN: false, allowInfinity: false }, { message: 'Кількість повинна бути числом' })
+	@Min(0, { message: "Кількість не може бути від'ємною" })
 	@IsOptional()
 	quantity: number
 }

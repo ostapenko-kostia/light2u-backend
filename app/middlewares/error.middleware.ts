@@ -14,14 +14,16 @@ export function errorMiddleware(
 
 		if (err instanceof ApiError) {
 			res.status(err.status).json({ message: err.message, ok: false })
+			return
 		}
 
-		console.log(err)
+		console.error('Непередбачувана помилка:', err)
 
 		res
 			.status(500)
 			.json({ message: 'Сталася непередбачувана помилка', ok: false })
-	} catch {
+	} catch (error) {
+		console.error('Помилка в обробнику помилок:', error)
 		return next()
 	}
 }
