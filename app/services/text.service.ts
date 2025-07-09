@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { ApiError } from '@/utils/api-error'
 
-class TextsService {
+class TextService {
 	async all() {
 		return await prisma.textField.findMany()
 	}
@@ -16,4 +16,4 @@ class TextsService {
 	}
 }
 
-export const textsService = new TextsService()
+export const textService = new TextService()

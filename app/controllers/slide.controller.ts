@@ -70,4 +70,4 @@ router.delete(
 	}
 )
 
-export const slidesController = router
+export const slideController = router

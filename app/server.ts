@@ -5,12 +5,13 @@ import express from 'express'
 import helmet from 'helmet'
 import { adminController } from './controllers/admin.controller'
 import { firstLevelCategoryController } from './controllers/first-level-category.controller'
-import { productsController } from './controllers/products.controller'
+import { productController } from './controllers/product.controller'
 import { secondLevelCategoryController } from './controllers/second-level-category.controller'
-import { slidesController } from './controllers/slides.controller'
+import { slideController } from './controllers/slide.controller'
 import { storageController } from './controllers/storage.controller'
-import { textsController } from './controllers/texts.controller'
+import { textController } from './controllers/text.controller'
 import { errorMiddleware } from './middlewares/error.middleware'
+import { objectController } from './controllers/object.controller'
 
 dotenv.config()
 const app = express()
@@ -31,11 +32,12 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
-app.use('/api/texts', textsController)
+app.use('/api/texts', textController)
 app.use('/api/admins', adminController)
-app.use('/api/slides', slidesController)
+app.use('/api/slides', slideController)
+app.use('/api/objects', objectController)
 app.use('/api/storage', storageController)
-app.use('/api/products', productsController)
+app.use('/api/products', productController)
 app.use('/api/first-level-categories', firstLevelCategoryController)
 app.use('/api/second-level-categories', secondLevelCategoryController)
 

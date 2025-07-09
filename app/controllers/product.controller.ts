@@ -1,5 +1,5 @@
 import { adminAuthMiddleware } from '@/middlewares/admin-auth.middleware'
-import { productsService } from '@/services/products.service'
+import { productService } from '@/services/product.service'
 import { NextFunction, Request, Response, Router } from 'express'
 import multer from 'multer'
 
@@ -14,7 +14,7 @@ const upload = multer({
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const serviceResponse = await productsService.get()
+		const serviceResponse = await productService.get()
 		res.status(200).json({ data: serviceResponse, ok: true })
 	} catch (error) {
 		next(error)
@@ -29,7 +29,7 @@ router.post(
 		try {
 			const productInfo = JSON.parse(req.body.productInfo)
 			const images = req.files
-			const product = await productsService.create(productInfo, images)
+			const product = await productService.create(productInfo, images)
 			res.status(200).json({ product, ok: true })
 		} catch (error) {
 			next(error)
@@ -46,7 +46,7 @@ router.put(
 			const productInfo = JSON.parse(req.body.productInfo ?? '{}')
 			const images = req.files
 			const id = +req.params.id
-			const product = await productsService.edit(id, productInfo, images)
+			const product = await productService.edit(id, productInfo, images)
 			res.status(200).json({ product, ok: true })
 		} catch (error) {
 			next(error)
@@ -60,7 +60,7 @@ router.delete(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const id = +req.params.id
-			await productsService.delete(id)
+			await productService.delete(id)
 			res.status(200).json({ ok: true })
 		} catch (error) {
 			next(error)
@@ -74,7 +74,7 @@ router.post(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const id = +req.params.id
-			const product = await productsService.duplicate(id)
+			const product = await productService.duplicate(id)
 			res.status(200).json({ product, ok: true })
 		} catch (error) {
 			next(error)
@@ -88,7 +88,7 @@ router.patch(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const id = +req.params.id
-			const product = await productsService.moveUp(id)
+			const product = await productService.moveUp(id)
 			res.status(200).json({ product, ok: true })
 		} catch (error) {
 			next(error)
@@ -102,7 +102,7 @@ router.patch(
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const id = +req.params.id
-			const product = await productsService.moveDown(id)
+			const product = await productService.moveDown(id)
 			res.status(200).json({ product, ok: true })
 		} catch (error) {
 			next(error)
@@ -110,4 +110,4 @@ router.patch(
 	}
 )
 
-export const productsController = router
+export const productController = router

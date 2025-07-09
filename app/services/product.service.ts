@@ -7,7 +7,7 @@ import { validate } from 'class-validator'
 import sharp from 'sharp'
 import slugify from 'slugify'
 
-class ProductsService {
+class ProductService {
 	async get() {
 		return await prisma.product.findMany({ include: { info: true } })
 	}
@@ -267,4 +267,4 @@ class ProductsService {
 	}
 }
 
-export const productsService = new ProductsService()
+export const productService = new ProductService()
