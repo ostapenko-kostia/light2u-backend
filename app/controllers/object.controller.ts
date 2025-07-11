@@ -21,14 +21,29 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 	}
 })
 
-router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const data = await objectService.getById(+req.params.id)
-		res.status(200).json({ data, ok: true })
-	} catch (error) {
-		next(error)
+router.get(
+	'/id/:id',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const data = await objectService.getById(+req.params.id)
+			res.status(200).json({ data, ok: true })
+		} catch (error) {
+			next(error)
+		}
 	}
-})
+)
+
+router.get(
+	'/slug/:slug',
+	async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const data = await objectService.getBySlug(req.params.slug)
+			res.status(200).json({ data, ok: true })
+		} catch (error) {
+			next(error)
+		}
+	}
+)
 
 router.post(
 	'/',

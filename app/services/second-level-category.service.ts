@@ -54,7 +54,14 @@ class SecondLevelCategoryService {
 		let savedImage: string
 
 		if (image) {
-			await deleteFile(candidate.image)
+			try {
+				await deleteFile(candidate.image)
+			} catch (error) {
+				console.log(
+					'Failed to delete image when updating second level category, continue... Error:',
+					error
+				)
+			}
 			const fileBuffer = await sharp(image.buffer).toFormat('jpg').toBuffer()
 			const imageUrl = await uploadFile(fileBuffer, `image-${Date.now()}.jpg`)
 			savedImage = imageUrl
@@ -82,7 +89,14 @@ class SecondLevelCategoryService {
 		if (!candidate)
 			throw new ApiError(404, 'Такої категорії другого рівня не існує')
 
-		await deleteFile(candidate.image)
+		try {
+			await deleteFile(candidate.image)
+		} catch (error) {
+			console.log(
+				'Failed to delete image when deleting second level category, continue... Error:',
+				error
+			)
+		}
 		await prisma.secondLevelCategory.delete({ where: { id } })
 	}
 }

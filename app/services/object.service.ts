@@ -1,10 +1,11 @@
-import { ObjectCreateDto } from '@/dtos/object.dto'
+import { ObjectCreateDto, ObjectEditDto } from '@/dtos/object.dto'
 import { prisma } from '@/lib/prisma'
 import { deleteFile, uploadFile } from '@/lib/s3'
 import { ApiError } from '@/utils/api-error'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import sharp from 'sharp'
+import slugify from 'slugify'
 
 class ObjectService {
 	async getAll() {
@@ -13,6 +14,10 @@ class ObjectService {
 
 	async getById(id: number) {
 		return await prisma.object.findUnique({ where: { id } })
+	}
+
+	async getBySlug(slug: string) {
+		return await prisma.object.findUnique({ where: { slug } })
 	}
 
 	async create(
@@ -41,6 +46,8 @@ class ObjectService {
 			})
 		)
 
+		const slug = await this.generateUniqueSlug(info.name, info.locale)
+
 		return await prisma.object.create({
 			data: {
 				images: savedImages,
@@ -48,14 +55,15 @@ class ObjectService {
 				description: info.description,
 				city: info.city,
 				address: info.address,
-				locale: info.locale || 'uk'
+				locale: info.locale || 'uk',
+				slug
 			}
 		})
 	}
 
 	async edit(
 		id: number,
-		info?: ObjectCreateDto | undefined,
+		info?: ObjectEditDto | undefined,
 		images?:
 			| {
 					[fieldname: string]: Express.Multer.File[]
@@ -65,7 +73,7 @@ class ObjectService {
 		const candidate = await prisma.object.findUnique({ where: { id } })
 		if (!candidate) throw new ApiError(404, "Такого об'єкта не існує")
 
-		const dto = plainToInstance(ObjectCreateDto, info ?? {})
+		const dto = plainToInstance(ObjectEditDto, info ?? {})
 
 		const errors = await validate(dto)
 		if (errors.length) {
@@ -98,8 +106,7 @@ class ObjectService {
 				name: info.name,
 				description: info.description,
 				city: info.city,
-				address: info.address,
-				locale: info.locale || 'uk'
+				address: info.address
 			}
 		})
 	}
@@ -113,6 +120,23 @@ class ObjectService {
 			console.log('Failed to delete images, continue...')
 		}
 		await prisma.object.delete({ where: { id } })
+	}
+
+	async generateUniqueSlug(
+		title: string,
+		locale: string = 'uk'
+	): Promise<string> {
+		const slug = slugify(title)
+		const slugWithLocale = `${slug}-${locale}`
+		let uniqueSlug = slugWithLocale
+		let counter = 1
+
+		while (await prisma.product.findUnique({ where: { slug: uniqueSlug } })) {
+			uniqueSlug = `${slugWithLocale}-${counter}`
+			counter++
+		}
+
+		return uniqueSlug
 	}
 }
 

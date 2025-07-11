@@ -12,6 +12,7 @@ import { storageController } from './controllers/storage.controller'
 import { textController } from './controllers/text.controller'
 import { errorMiddleware } from './middlewares/error.middleware'
 import { objectController } from './controllers/object.controller'
+import emailController from './controllers/email.controller'
 
 dotenv.config()
 const app = express()
@@ -33,6 +34,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use('/api/texts', textController)
+app.use('/api/email', emailController)
 app.use('/api/admins', adminController)
 app.use('/api/slides', slideController)
 app.use('/api/objects', objectController)

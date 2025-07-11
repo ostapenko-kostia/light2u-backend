@@ -34,10 +34,17 @@ class SlideService {
 
 		const dto = plainToInstance(SlideCreateDto, info)
 
-		let savedImage: string = ''
+		let savedImage: string = candidate.background
 
 		if (image) {
-			await deleteFile(candidate.background)
+			try {
+				await deleteFile(candidate.background)
+			} catch (error) {
+				console.log(
+					'Failed to delete image when updating slide, continue... Error:',
+					error
+				)
+			}
 			const fileBuffer = await sharp(image.buffer).toFormat('jpg').toBuffer()
 			const imageUrl = await uploadFile(fileBuffer, `image-${Date.now()}.jpg`)
 			savedImage = imageUrl
@@ -60,7 +67,14 @@ class SlideService {
 		const candidate = await prisma.slide.findUnique({ where: { id } })
 		if (!candidate) throw new ApiError(404, 'Такого слайду не існує')
 
-		await deleteFile(candidate.background)
+		try {
+			await deleteFile(candidate.background)
+		} catch (error) {
+			console.log(
+				'Failed to delete image when deleting slide, continue... Error:',
+				error
+			)
+		}
 		await prisma.slide.delete({ where: { id } })
 	}
 }

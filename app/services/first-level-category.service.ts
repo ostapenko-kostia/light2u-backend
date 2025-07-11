@@ -49,7 +49,14 @@ class FirstLevelCategoryService {
 		let savedImage: string
 
 		if (image) {
-			await deleteFile(candidate.image)
+			try {
+				await deleteFile(candidate.image)
+			} catch (error) {
+				console.log(
+					'Failed to delete image when updating first level category, continue... Error:',
+					error
+				)
+			}
 			const fileBuffer = await sharp(image.buffer).toFormat('jpg').toBuffer()
 			const imageUrl = await uploadFile(fileBuffer, `image-${Date.now()}.jpg`)
 			savedImage = imageUrl
@@ -77,7 +84,14 @@ class FirstLevelCategoryService {
 		if (!candidate)
 			throw new ApiError(404, 'Такої категорії першого рівня не існує')
 
-		await deleteFile(candidate.image)
+		try {
+			await deleteFile(candidate.image)
+		} catch (error) {
+			console.log(
+				'Failed to delete image when deleting first level category, continue... Error:',
+				error
+			)
+		}
 		await prisma.firstLevelCategory.delete({ where: { id } })
 	}
 }

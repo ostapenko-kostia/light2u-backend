@@ -112,6 +112,7 @@ model Object {
   id Int @id @unique @default(autoincrement())
 
   name        String
+  slug        String   @unique
   images      String[]
   description String
 
@@ -121,5 +122,5 @@ model Object {
   locale String @default("uk")
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }

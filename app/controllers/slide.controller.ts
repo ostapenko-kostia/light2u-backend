@@ -33,7 +33,7 @@ router.post(
 router.put(
 	'/:id',
 	adminAuthMiddleware,
-	upload.single('image'),
+	upload.single('background'),
 	async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const image = req.file

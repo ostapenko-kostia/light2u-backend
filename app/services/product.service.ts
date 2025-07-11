@@ -88,7 +88,14 @@ class ProductService {
 		let savedImages: string[]
 
 		if (images) {
-			await Promise.all(candidate.images.map(i => deleteFile(i)))
+			try {
+				await Promise.all(candidate.images.map(i => deleteFile(i)))
+			} catch (error) {
+				console.log(
+					'Failed to delete images when updating product, continue... Error:',
+					error
+				)
+			}
 
 			const normalizedImages = Array.isArray(images)
 				? images
@@ -102,6 +109,10 @@ class ProductService {
 					return await uploadFile(fileBuffer, `image-${Date.now()}.jpg`)
 				})
 			)
+		}
+
+		if (productInfo.productInfo?.length > 0) {
+			await prisma.productInfo.deleteMany({ where: { productId: id } })
 		}
 
 		return await prisma.product.update({
